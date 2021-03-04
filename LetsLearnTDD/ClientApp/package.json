@@ -16,6 +16,7 @@
     "rimraf": "^2.6.2"
   },
   "devDependencies": {
+    "@types/jest": "^26.0.20",
     "@types/react-dom": "^17.0.1",
     "@types/react-router-dom": "^5.1.7",
     "@types/reactstrap": "^8.7.2",
