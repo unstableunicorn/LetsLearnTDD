@@ -42,7 +42,7 @@ export class NavMenu extends Component<IProps, IState> {
                   <NavLink tag={Link} className="text-dark" to="/counter">Counter</NavLink>
                 </NavItem>
                 <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/fetch-data">Fetch data</NavLink>
+                  <NavLink tag={Link} className="text-dark" to="/hello">Hello</NavLink>
                 </NavItem>
               </ul>
             </Collapse>
