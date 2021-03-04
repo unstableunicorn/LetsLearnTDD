@@ -35,10 +35,27 @@ dotnet run
 Confirm application can be accessed on local host.
 Go to the 'Hello' link and show that only `Loading...` is shown as we have not put the code in the backend yet.
 
-## First test
-Before we create the controller and have a fully running solution lets start small and add out first test. At this stage we just want our tests to build, then we need to get them to pass, then we will refactor.
-We need to think about what our app is and what we expect it to do, in this example we have an MVC app and our front end will expect a model with name so we will create a test for that!
+## Before we begin
+Before we create the controller and have a fully running solution lets start small and add out first test.
+The stages we are going to go through are:
+1. Get our tests to build
+1. Get tests to pass
+1. Refactor
 
+We need to think about what our app is and what we expect it to do so lets list our end goal:  
+**A webpage where a user enters the their details, this data will be formated and returned to the user with additional details found about the user or performed by the server**
+The above will guide our development and test efforts.
+
+Lets start with an easy test that will only make sure our Model has a Name field, this will form the basis that everything is built on. You may ask why are we choosing this as our starting point?
+1. The front end needs to send the data to the controller so we want a controller before the front end
+1. The controller needs to work with the data so it needs to have a Model to work with
+
+For the keen eyes we could do the reverse and start with the Front End code, however a lot of Front End work is connecting to back end api's so I figured we start by creating the Back End API first.
+
+**Q: Do we need all these tests???** A senior developer I know perfectly summed this up for me: `Think of code as a cost, unless it has value it is just a cost`  
+**A: No!** but to learn how to write the code with tests we should start with some easy first steps and we can then refactor out tests that are not needed later when we identify it has no value. As you progress you will learn to identify which code adds value and which code is just a cost. 
+
+## First test
 In the `LetsLearnTDD.Tests` folder, create a folder called `Models` and create a file called `HelloWorldTest.cs`:  [LetsLearnTDD.Tests/Models/HelloWorldTest.cs](LetsLearnTDD.Tests/Models/HelloWorldTest.cs)
 
 In the file create the NUnit test class as below:
@@ -122,7 +139,7 @@ namespace LetsLearnTDD.Models
 }
 ```
 
-After saving the file if we run `dotnet build` again it should all pass! Yay we now have our tests building now we need to get them to pass.
+After saving the file if we run `dotnet build` again it should all pass! Yay we have our tests building, now we need to get them to pass.
 
 Run `dotnet test` in the `LetsLearnTDD.Tests` folder and inspect the error message.
 ```
@@ -188,7 +205,7 @@ namespace LetsLearnTDD.Tests.Controllers
 }
 ```
 
-In the above file we have added a `TestGet` method which will only care we get a valid `200`Ok from the controller. We create a new Controller for our testing and then call the `Get` Method.
+In the above file we have added a `TestGet` method which will only care we get a valid `200` Ok reponse from the controller. We create a new Controller for our testing and then call the `Get` Method.
 
 Try to build your tests again and note the output.
 
@@ -269,8 +286,7 @@ Lets now get the tests to pass by changing the hello world `Get` method to retur
 
 Now when we run `dotnet test` all our test should pass.
 
-We have now completed your first controller test!
-
+You have now completed your first controller test!
 
 ## Next steps
 1. Test setup and tear down
