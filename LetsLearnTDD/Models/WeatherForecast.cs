@@ -1,6 +1,6 @@
 using System;
 
-namespace LetsLearnTDD
+namespace LetsLearnTDD.Models
 {
     public class WeatherForecast
     {
