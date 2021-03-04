@@ -2,28 +2,33 @@ import React, { Component } from 'react';
 
 type IProps = {};
 
+type nameModel = {
+  name: string
+}
+
 interface IState {
-  helloname: string
+  helloname: nameModel
   loading: boolean
 }
+
 
 export class HelloWorld extends Component<IProps, IState> {
   static displayName = HelloWorld.name;
 
   constructor(props: IProps) {
     super(props);
-    this.state = { helloname: "", loading: true };
+    this.state = { helloname: { name: "unknown" }, loading: true };
   }
 
   componentDidMount() {
     this.populateName();
   }
 
-  static renderHello(name: string) {
+  static renderHello(data: nameModel) {
     return (
       <div>
         <h2>
-          Hello {name}
+          Hello {data.name}
         </h2>
       </div>
     );
@@ -45,7 +50,7 @@ export class HelloWorld extends Component<IProps, IState> {
 
   async populateName() {
     const response = await fetch('helloworld');
-    const data = await response.json();
+    const data: nameModel = await response.json();
     this.setState({ helloname: data, loading: false });
   }
 }
