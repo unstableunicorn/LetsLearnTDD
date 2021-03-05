@@ -55,7 +55,8 @@ For the keen eyes we could do the reverse and start with the Front End code, how
 **Q: Do we need all these tests???** A senior developer I know perfectly summed this up for me: `Think of code as a cost, unless it has value it is just a cost`  
 **A: No!** but to learn how to write the code with tests we should start with some easy first steps and we can then refactor out tests that are not needed later when we identify it has no value. As you progress you will learn to identify which code adds value and which code is just a cost. 
 
-## First test
+## Develop The Controller
+### First test
 In the `LetsLearnTDD.Tests` folder, create a folder called `Models` and create a file called `HelloWorldTest.cs`:  [LetsLearnTDD.Tests/Models/HelloWorldTest.cs](LetsLearnTDD.Tests/Models/HelloWorldTest.cs)
 
 In the file create the NUnit test class as below:
@@ -163,7 +164,9 @@ And if we run our tests again with `dotnet test` everything should pass.
 
 Contratulations on your first bit of C# TDD!
 
-## Controller Testing
+**Note:** *Testing the Model is an Anti-Pattern as it is not required. We will leave this in as it was an introduction and basic first test to write. Our Controller tests should pick up any changes to the Model and we can correct those as we progress.*
+
+### Controller Testing
 We have so far written the most basic test which allows us to test the model we eventually want to return to the front end.
 To send this model we will need a controller so lets go ahead and create the following directory and file: [LetsLearnTDD.Tests/Controllers/HelloWorldControllerTest.cs](LetsLearnTDD.Tests/Controllers/HelloWorldControllerTest.cs)
 
@@ -267,6 +270,7 @@ namespace LetsLearnTDD.Controllers
 Running dotnet build should now pass! But do our tests???
 
 Run `dotnet test` and check the result, we expect a failure as we are checking for a good result but actually returning a bad result. This is to confirm the test is not an `Evergreen` test that will always pass and allow us to focus on getting the tests to build first.
+We knew this hoever it is good practise to write a test that will fail before we change our code to make it pass.
 
 You should get the following:
 ```
@@ -287,6 +291,150 @@ Lets now get the tests to pass by changing the hello world `Get` method to retur
 Now when we run `dotnet test` all our test should pass.
 
 You have now completed your first controller test!
+
+Let's now build on this, we don't want just an ok reponse, we would like to return our HelloWorld Model which contains our Name.
+
+Let start by adding another test to check if our controller returns a default Name of `Unicorn`. In your `HelloWorldControllerTest.cs` add a new test for this:
+```csharp
+        [Test]
+        public void TestDefaultNameGet()
+        {
+            var controller = new HelloWorldController();
+            var response = controller.Get();
+            Assert.AreEqual("Unicorn", response.Name);
+        }
+```
+Try to build the tests with `dotnet build` and note the output says the reponse `OkResult` does not have a Name. Let's make our Controller return the default object. In the `HelloWorldController.cs` file change our get method to below and return a HelloWorld Model(note we need to use the Model namespace so add it to the top):
+```csharp
+using LetsLearnTDD.Models;
+```
+```csharp
+        [HttpGet]
+        public HelloWorld Get()
+        {
+            return new HelloWorld();
+        }
+```
+Run build again and check the output.
+Our first test now does not have a StatusCode definition, we need to wrap our HelloWorld in an OkObjectResult so we can check the status code.
+```csharp
+        public OkObjectResult Get()
+        {
+            return new OkObjectResult(new HelloWorld());
+        }
+```
+We will also need to update our new test to cast our response value as a HelloWorld Model, `HelloWorldControllerTests.cs`:
+```csharp
+        public void TestDefaultNameGet()
+        {
+            var controller = new HelloWorldController();
+            var response = controller.Get().Value as HelloWorld;
+            Assert.AreEqual("Unicorn", response.Name);
+        }
+```
+Running build should now pass, however running test will fail with the below:
+```
+  X TestDefaultNameGet [142ms]
+  Error Message:
+     Expected: "Unicorn"
+  But was:  null
+```
+We can now set the value our get method and return it.
+
+*To make life a little easier `dotnet` has a built in `watch` that will monitor the project for file changes and auto rerun tests. This can be make life a little easier by making it so you don't need to run them manually. Also by default it builds things first so we can focus on having it build and then getting the test to pass. Run it now with:*
+```
+dotnet watch test
+```
+
+In our HelloWorld Controller check our get method to return a new model with the Name "Unicorn":
+```csharp
+        public OkObjectResult Get()
+        {
+            var helloWorld = new HelloWorld{Name = "Unicorn"};
+            return new OkObjectResult(helloWorld);
+        }
+```
+
+The `dotnet watch test` command should automatically pick up the change on save and show you we now have 3 tests passing!
+
+### Refactor
+We don't have much to refactor at this point, if we image that we will have a lot of tests there are a few things to look at.
+
+First we have given all our test classes a Generic Name of `Tests`. This may be fine if our project only has one controller and no other tests however as our project grows we should make sure each test class has an appropriate name.
+
+Lets change our `HelloWorldTest.cs` to have the following class name:
+```csharp
+    public class HelloWorldModelTests
+```
+And similarily for our controller tests:
+```csharp
+    public class HelloWorlControllerTests
+```
+
+Next if we look at the controller tests we are repeating our selves a bit. We can move our controller creation in to a setup class and then reference that in each test like so:
+```csharp
+    public class HelloWorlControllerTests
+    {
+        HelloWorldController Controller;
+
+        [SetUp]
+        public void SetUp()
+        {
+            Controller = new HelloWorldController();
+        }
+...
+```
+We can now remove that from each test and just reference the `Controller`, our final Controller test file should now match:
+```csharp
+using NUnit.Framework;
+using LetsLearnTDD.Controllers;
+using LetsLearnTDD.Models;
+
+namespace LetsLearnTDD.Tests.Controllers
+{
+    public class HelloWorlControllerTests
+    {
+        HelloWorldController Controller;
+
+        [SetUp]
+        public void SetUp()
+        {
+            Controller = new HelloWorldController();
+        }
+
+        [Test]
+        public void TestGet()
+        {
+            var response = Controller.Get();
+            Assert.AreEqual(200, response.StatusCode);
+        }
+
+        [Test]
+        public void TestDefaultNameGet()
+        {
+            var response = Controller.Get().Value as HelloWorld;
+            Assert.AreEqual("Unicorn", response.Name);
+        }
+    }
+}
+```
+
+And running the tests again everything should pass.
+
+We now have a good base to continue writing small increments to our test.
+
+### Testing our endpoint
+We have yet to add it to the front end so how can we simple test it?
+For the moment stop your tests from being watched and lets run the application. Navigate to the `LetsLearnTDD` project folder and type `dotnet run`
+Once it is up and running use *cURL* to send a get request and you should get the following:
+
+```bash
+curl https://localhost:5001/helloworld
+{"name":"Unicorn"}
+```
+At this stage we have finished our basic back end. We can now move on to the front end and add out first increment or continue with developing and testing the back end until it is complete.
+
+For this turorial we are now going to move to developing the front end.
 
 ## Next steps
 1. Test setup and tear down
