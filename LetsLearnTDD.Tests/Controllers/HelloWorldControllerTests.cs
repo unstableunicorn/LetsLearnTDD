@@ -4,21 +4,27 @@ using LetsLearnTDD.Models;
 
 namespace LetsLearnTDD.Tests.Controllers
 {
-    public class Tests
+    public class HelloWorlControllerTests
     {
+        HelloWorldController Controller;
+
+        [SetUp]
+        public void SetUp()
+        {
+            Controller = new HelloWorldController();
+        }
+
         [Test]
         public void TestGet()
         {
-            var controller = new HelloWorldController();
-            var response = controller.Get();
+            var response = Controller.Get();
             Assert.AreEqual(200, response.StatusCode);
         }
 
         [Test]
         public void TestDefaultNameGet()
         {
-            var controller = new HelloWorldController();
-            var response = controller.Get().Value as HelloWorld;
+            var response = Controller.Get().Value as HelloWorld;
             Assert.AreEqual("Unicorn", response.Name);
         }
     }

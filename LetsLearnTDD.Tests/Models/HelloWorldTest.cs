@@ -3,7 +3,7 @@ using LetsLearnTDD.Models;
 
 namespace LetsLearnTDD.Tests.Models
 {
-    public class Tests
+    public class HelloWorldModelTests
     {
         [Test]
         public void HelloWorldWithGivenName()
