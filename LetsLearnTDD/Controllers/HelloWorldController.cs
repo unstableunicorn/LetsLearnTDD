@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using LetsLearnTDD.Models;
 
 namespace LetsLearnTDD.Controllers
 {
@@ -9,9 +10,10 @@ namespace LetsLearnTDD.Controllers
         public HelloWorldController() {} 
 
         [HttpGet]
-        public OkResult Get()
+        public OkObjectResult Get()
         {
-            return Ok();
+            var helloWorld = new HelloWorld{Name = "Unicorn"};
+            return new OkObjectResult(helloWorld);
         }
     }
 }
